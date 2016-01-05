@@ -2,10 +2,19 @@ package lesson1;
 
 public class HashTable {
 
-	private String ar[][] = new String[100][2];
+	private String ar[][] = new String[16][2];
 
 	HashTable() {
-		for (int i = 0; i < 100; i++) {
+		this(16);
+	}
+
+	HashTable(int initialSize) {
+		if (initialSize < 0)
+			throw new IllegalArgumentException("Illegal initial capacity: "
+					+ initialSize);
+		
+		ar = new String[initialSize][2];
+		for (int i = 0; i < initialSize; i++) {
 			ar[i][0] = "-1";
 		}
 	}
@@ -43,7 +52,8 @@ public class HashTable {
 		while (true) {
 			if (index < ar.length) {
 				if (ar[index][0].equals(hash_code + "")) {
-					System.out.println("Value " + value + " removed from position " + index);
+					System.out.println("Value " + value
+							+ " removed from position " + index);
 					ar[index][0] = "-1";
 					ar[index][1] = "";
 					break;
@@ -51,8 +61,8 @@ public class HashTable {
 			}
 			index++;
 			if (index > ar.length) {
-				System.out
-						.println("Value " + value + " not fouded in hash-table. Can't remove value.");
+				System.out.println("Value " + value
+						+ " not fouded in hash-table. Can't remove value.");
 				break;
 			}
 		}
@@ -64,17 +74,18 @@ public class HashTable {
 		while (true) {
 			if (index < ar.length) {
 				if (ar[index][0].equals(hash_code + "")) {
-					System.out.println("Value " + value + " founded in position " + index);
+					System.out.println("Value " + value
+							+ " founded in position " + index);
 					break;
 				} else {
-					System.out
-							.println("Value " + value + " not founded in position " + index);
+					System.out.println("Value " + value
+							+ " not founded in position " + index);
 				}
 			}
 			index++;
 			if (index > ar.length) {
-				System.out
-						.println("Value " + value + " not fouded in hash-table. Searching stopped.");
+				System.out.println("Value " + value
+						+ " not fouded in hash-table. Searching stopped.");
 				break;
 			}
 		}
