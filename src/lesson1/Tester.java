@@ -1,7 +1,6 @@
 package lesson1;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import lesson1.HashTable.Entry;
 
 import org.junit.Test;
@@ -13,84 +12,146 @@ public class Tester {
 
 		HashTable<Integer, String> table = new HashTable<Integer, String>(10);
 
-		String[] initialValues = new String[] { "Moby Dick", "James Huges",
-				"Alan Cooper", "Freddy Mercury", "yboM Dick" };
+		System.out.println("Test adding...");
+		System.out.println("Add normal int keys");
+		table.addEntry(457, "Moby Dick");
+		table.addEntry(234, "Moby Dick");
+		table.addEntry(457, "James Huges");
+		table.addEntry(-1, "James Huges");
+		table.addEntry(100000, "Liverpool");
+		table.addEntry(1256 - 4, "Man United");
 
-		table.add(initialValues);
-		table.remove("Moby Dick");
+		Entry e = table.getEntry(457);
+		assertTrue(e.getValue().equals("Moby Dick"));
+		System.out.println("Test done");
 
-		Entry e = table.getEntry("James Huges");
-		assertTrue("Error", e.getHash() == "James Huges".hashCode());
+		HashTable<String, String> tableStr = new HashTable<String, String>(10);
+		System.out.println("Add normal String keys");
+		tableStr.addEntry("457", "Moby Dick");
+		tableStr.addEntry("234", "Moby Dick");
+		tableStr.addEntry("457", "Wrong Side");
+		tableStr.addEntry("456", "Of Heaven");
+		tableStr.addEntry("456", "James Huges 123");
+		tableStr.addEntry("456" + " ", "James Huges 123");
 
-		e = table.getEntry("Alan Cooper");
-		assertTrue("Error", e.getHash() == "Alan Cooper".hashCode());
+		e = tableStr.getEntry("457");
+		assertTrue(e.getValue().equals("Moby Dick"));
+		System.out.println("Test done");
 
-		e = table.getEntry("Freddy Mercury");
-		assertTrue("Error", e.getHash() == "Freddy Mercury".hashCode());
+		System.out.println("Add bad keys");
+		table.addEntry(null, "Null Pointer");
+		table.addEntry(Integer.getInteger("str"), "Integer from string");
+		System.out.println("Test done");
 
-		table.remove("James Huges");
-		table.remove("Alan Cooper");
-		table.remove("Freddy Mercury");
-		e = table.getEntry("James Huges");
+		e = table.getEntry(null);
+		assertNull(e);
+		e = table.getEntry(Integer.getInteger("str"));
 		assertNull(e);
 
-		table.add(new String[] { "<p>This", "implementation", "provides",
-				"constant-time", "performance", "for", "the",
-				"basic operations", "(<tt>get</tt>", "and", "<tt>put</tt>),",
-				"assuming", "the", "hash", "function disperses", "the",
-				"elements", "properly", "among", "the", "buckets.", "",
-				"Iteration", "over collection", "views", "requires", "time",
-				"proportional", "to", "the", "capacity", "of",
-				"the <tt>HashMap</tt>", "instance", "(the", "number", "of",
-				"buckets)", "plus", "its", "size", "(the", "number", "of",
-				"key-value", "mappings).", "", "Thus,", "it's", "very",
-				"important", "not", "to", "set", "the", "initial capacity",
-				"too", "high", "(or", "the", "load", "factor", "too", "low)",
-				"if", "iteration", "performance", "is important." });
-		
-		table.remove("");
-		e = table.getEntry("");
-		assertTrue("Error", e.getHash() == "".hashCode());
+		System.out.println("Test addding... done");
+		System.out.println();
+	}
 
-		table.remove("");
-		e = table.getEntry("");
+	@Test
+	public void testRemove() {
+		HashTable<String, String> tableStr = new HashTable<String, String>(10);
+		System.out.println("Test removing...");
+
+		tableStr.addEntry("457", "Moby Dick");
+		tableStr.addEntry("234", "Moby Dick");
+		tableStr.addEntry("457", "Wrong Side");
+		tableStr.addEntry("456", "Of Heaven");
+		tableStr.addEntry("456", "James Huges 123");
+		tableStr.addEntry("456" + " ", "James Huges with space");
+
+		tableStr.removeEntry("456");
+		tableStr.removeEntry("457");
+		tableStr.removeEntry("456");
+
+		Entry e = tableStr.getEntry("457");
 		assertNull(e);
-
-		HashTable<Integer, Integer> secondTable = new HashTable<Integer, Integer>(
-				10);
-		secondTable.add(1);
-		secondTable.add(1);
-		secondTable.add(1);
-		secondTable.add(1);
-		secondTable.add(1);
-		secondTable.add(1);
-		secondTable.add(1);
-		secondTable.add(1);
-		secondTable.add(1);
-		secondTable.add(1);
-		secondTable.add(1);
-		secondTable.add(1);
-		secondTable.add(1);
-		secondTable.remove(1);
-		e = secondTable.getEntry(1);
-		assertTrue("Error", e.getHash() == new Integer(1).hashCode());
-
-		secondTable.remove(1);
-		secondTable.remove(1);
-		secondTable.remove(1);
-		secondTable.remove(1);
-		secondTable.remove(1);
-		secondTable.remove(1);
-		secondTable.remove(1);
-		secondTable.remove(1);
-		secondTable.remove(1);
-		secondTable.remove(1);
-		secondTable.remove(1);
-		secondTable.remove(1);
-		secondTable.remove(1);
-		secondTable.remove(1);
-		e = secondTable.getEntry(1);
+		System.out.println("Test done");
+		e = tableStr.getEntry("456");
 		assertNull(e);
+		System.out.println("Test done");
+		e = tableStr.getEntry("456 ");
+		assertNotNull(e);
+		System.out.println("Test done");
 
+		tableStr.removeEntry(null);
+		tableStr.removeEntry((new Integer(1)).toString());
+		tableStr.removeEntry((new Integer(234)).toString());
+		tableStr.removeEntry("str");
+
+		System.out.println("Test removing...  done");
+		System.out.println();
+
+	}
+
+	@Test
+	public void testIsContain() {
+
+		HashTable<String, String> tableStr = new HashTable<String, String>(10);
+		System.out.println("Test IsContain...");
+		tableStr.addEntry("457", "Moby Dick");
+		tableStr.addEntry("234", "Moby Dick");
+		tableStr.addEntry("457", "Wrong Side");
+		tableStr.addEntry("456", "Of Heaven");
+		tableStr.addEntry("456", "James Huges 123");
+		tableStr.addEntry("456" + " ", "James Huges with space");
+
+		tableStr.removeEntry("456");
+		tableStr.removeEntry("457");
+		tableStr.removeEntry("456");
+
+		int res = tableStr.isContainsKey(null);
+		assertTrue(res == -1);
+		System.out.println("Test done");
+		res = tableStr.isContainsKey("1");
+		assertTrue(res == -1);
+		System.out.println("Test done");
+		res = tableStr.isContainsKey("456");
+		assertTrue(res == -1);
+		System.out.println("Test done");
+		res = tableStr.isContainsKey("456 ");
+		assertTrue(res != -1);
+		System.out.println("Test done");
+
+		System.out.println("Test IsContain... done");
+		System.out.println();
+	}
+
+	@Test
+	public void testGetEntry() {
+
+		HashTable<String, String> tableStr = new HashTable<String, String>(10);
+		System.out.println("Test getEntry...");
+		tableStr.addEntry("457", "Moby Dick");
+		tableStr.addEntry("234", "Moby Dick");
+		tableStr.addEntry("457", "Wrong Side");
+		tableStr.addEntry("456", "Of Heaven");
+		tableStr.addEntry("456", "James Huges 123");
+		tableStr.addEntry("456" + " ", "James Huges with space");
+
+		Entry e = tableStr.getEntry("457");
+		assertNotNull(e);
+		System.out.println("Test done");
+		assertTrue(e.getKey() == "457");
+		System.out.println("Test done");
+		assertTrue(e.getValue() == "Moby Dick");
+		System.out.println("Test done");
+
+		e = tableStr.getEntry("456");
+		assertTrue(e.getKey() == "456");
+		System.out.println("Test done");
+		assertTrue(e.getValue() == "Of Heaven");
+		System.out.println("Test done");
+
+		e = tableStr.getEntry(null);
+		assertNull(e);
+		System.out.println("Test done");
+
+		System.out.println("Test getEntry... done");
+		System.out.println();
 	}
 }

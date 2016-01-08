@@ -121,7 +121,7 @@ public class HashTable<K, V> extends AbstractMap<K, V> {
 		}
 	}
 
-	public boolean remove(K Key) {
+	public boolean removeEntry(K Key) {
 		int index = -1;
 		if ((index = isContainsKey(Key)) != -1) {
 			hashTable[index] = null;
@@ -132,29 +132,34 @@ public class HashTable<K, V> extends AbstractMap<K, V> {
 
 	}
 
-	public Entry<K, V> getEntry(K Key) {
-		int index = -1;
-		if ((index = isContainsKey(Key)) != -1) {
-			return hashTable[index];
-		} else {
-			return null;
+	public Entry<K, V> getEntry(K key) {
+		if (null != key) {
+			int index = -1;
+			if ((index = isContainsKey(key)) != -1) {
+				return hashTable[index];
+			} else {
+				return null;
+			}
 		}
-
+		return null;
 	}
 
-	public int isContainsKey(K Key) {
-		int index = getIndexByHash(Key);
-		while (true) {
-			if (index < size()) {
-				if (isEntryExist(getHashByKey(Key), index, Key)) {
-					return index;
+	public int isContainsKey(K key) {
+		if (null != key) {
+			int index = getIndexByHash(key);
+			while (true) {
+				if (index < size()) {
+					if (isEntryExist(getHashByKey(key), index, key)) {
+						return index;
+					}
+				}
+				index++;
+				if (index >= size()) {
+					return -1;
 				}
 			}
-			index++;
-			if (index >= size()) {
-				return -1;
-			}
 		}
+		return -1;
 	}
 
 	private int getIndexByHash(K Key) {
