@@ -9,10 +9,10 @@ public class HashTable<K, V> extends AbstractMap<K, V> {
 	static final int DEFAULT_INITIAL_SIZE = 16;
 
 	/*
-	 * Данный массив будет содержать объекты типа Entry. Каждый такой объект
-	 * содержит в себе значение и хеш-код данного значения.
+	 * This array will contain Entry's objects. Each this object contain three
+	 * atributes: key, value and hash-code.
 	 */
-	private Entry<V> hashTable[];
+	private Entry<K, V> hashTable[];
 
 	HashTable() {
 		this(DEFAULT_INITIAL_SIZE);
@@ -27,86 +27,86 @@ public class HashTable<K, V> extends AbstractMap<K, V> {
 	}
 
 	/*
-	 * Объект типа Entry содержит два атрибута типа int и V: - int hash
-	 * расчитывается на основании value, которое ввел пользователь - V value -
-	 * тип атрибута указывается при создании HashTable
+	 * Each object contain three atributes: K key - unique attribute, int hash -
+	 * this attributes based on key, V value,
 	 */
-	static class Entry<V> {
+	static class Entry<K, V> {
+		K key;
 		V value;
 		int hash;
 
-		Entry(int h, V v) {
-			value = v;
+		Entry(int h, K k, V v) {
+			key = k;
 			hash = h;
+			value = v;
+		}
+
+		public final K getKey() {
+			return key;
+		}
+
+		private final int getHash() {
+			return hash;
 		}
 
 		public final V getValue() {
 			return value;
 		}
 
-		public final int getHash() {
-			return hash;
-		}
-
-		public final V setValue(V newValue) {
-			V oldValue = value;
-			value = newValue;
-			return oldValue;
-		}
-
 		public final String toString() {
-			return getHash() + "=" + getValue();
+			return getHash() + "=" + getKey();
 		}
 
-	}
-
-	public void add(V[] values) {
-		for (V value : values) {
-			this.add(value);
-		}
 	}
 
 	/*
-	 * Расчет индекса производится на основе хеш-кода и размера массива, в
-	 * котором хранятся объекты типа Entry
+	 * Index calculation based on hash-code and array's length, in which Entry's
+	 * objects is storage
 	 */
 	private int hashIndex(int hashCode) {
 		return (hashCode & (this.size() - 1));
 	}
 
 	/*
-	 * Добавление ключа проводится на основе открытой адресациии. При коллизии
-	 * использутеся линейное пробивание с шагом 1
+	 * Adding key is based on the open addressing. When a collision is used
+	 * linear penetration whit step 1
 	 */
-	public void add(V value) {
-		if (null != value) {
-			int index = getIndexByHash(value);
 
-			if (!put(index, getHashByValue(value), value)) {
-				int position = index + 1;
-				while (true) {
-					if (put(position, getHashByValue(value), value)) {
-						break;
-					}
-					position++;
+	public boolean addEntry(K key, V value) {
+		if (null != key) {
+			int index = getIndexByHash(key);
+
+			for (int i = index; i < size(); i++) {
+				if (null != hashTable[i]
+						&& hashTable[i].getKey().toString()
+								.equals(key.toString())) {
+					return false;
+				}
+
+			}
+
+			while (true) {
+				if (null == hashTable[index]) {
+					putEntry(index, getHashByKey(key), key, value);
+					return true;
+				} else if (hashTable[index].getKey() == key) {
+					return false;
+				}
+				index++;
+				if (index >= size()) {
+					putEntry(index, getHashByKey(key), key, value);
+					return true;
 				}
 			}
 		}
+		return false;
 	}
 
-	/*
-	 * Если при добавлении элемента в массив не находится свободного места,
-	 * размер массива увеличивается на 1.
-	 */
-	private boolean put(int index, int hashCode, V value) {
+	private void putEntry(int index, int hashCode, K key, V value) {
 		if (index >= size()) {
 			resize();
 		}
-		if (null == hashTable[index]) {
-			hashTable[index] = new Entry(hashCode, value);
-			return true;
-		}
-		return false;
+		hashTable[index] = new Entry(hashCode, key, value);
 	}
 
 	public int size() {
@@ -121,9 +121,9 @@ public class HashTable<K, V> extends AbstractMap<K, V> {
 		}
 	}
 
-	public boolean remove(V value) {
+	public boolean remove(K Key) {
 		int index = -1;
-		if ((index = isContains(value)) != -1) {
+		if ((index = isContainsKey(Key)) != -1) {
 			hashTable[index] = null;
 			return true;
 		} else {
@@ -132,11 +132,21 @@ public class HashTable<K, V> extends AbstractMap<K, V> {
 
 	}
 
-	public int isContains(V value) {
-		int index = getIndexByHash(value);
+	public Entry<K, V> getEntry(K Key) {
+		int index = -1;
+		if ((index = isContainsKey(Key)) != -1) {
+			return hashTable[index];
+		} else {
+			return null;
+		}
+
+	}
+
+	public int isContainsKey(K Key) {
+		int index = getIndexByHash(Key);
 		while (true) {
 			if (index < size()) {
-				if (isEntryExist(getHashByValue(value), index, value)) {
+				if (isEntryExist(getHashByKey(Key), index, Key)) {
 					return index;
 				}
 			}
@@ -147,38 +157,29 @@ public class HashTable<K, V> extends AbstractMap<K, V> {
 		}
 	}
 
-	public Entry<V> getEntry(V value) {
-		int index = -1;
-		if ((index = isContains(value)) != -1) {
-			return hashTable[index];
-		} else {
-			return null;
-		}
-
+	private int getIndexByHash(K Key) {
+		return hashIndex(getHashByKey(Key));
 	}
 
-	private int getIndexByHash(V value) {
-		return hashIndex(getHashByValue(value));
+	private int getHashByKey(K Key) {
+		return Key.hashCode();
 	}
 
-	private int getHashByValue(V value) {
-		return value.hashCode();
-	}
-
-	private boolean isEntryExist(int hashCode, int index, V value) {
+	private boolean isEntryExist(int hashCode, int index, K key) {
 		return (null != hashTable[index] && (hashTable[index].getHash() == hashCode && hashTable[index]
-				.getValue().equals(value)));
+				.getKey().equals(key)));
 	}
 
-	public Entry<V>[] getTable() {
+	public Entry<K, V>[] getTable() {
 		return hashTable;
 	}
 
 	public void printf() {
 		for (int i = 0; i < size(); i++) {
 			if (null != hashTable[i]) {
-				System.out.println(" hash = " + hashTable[i].getHash()
-						+ " value = " + hashTable[i].getValue());
+				System.out.println(i + " hash = " + hashTable[i].getHash()
+						+ " Key = " + hashTable[i].getKey() + " Value= "
+						+ hashTable[i].getValue());
 			}
 		}
 	}
