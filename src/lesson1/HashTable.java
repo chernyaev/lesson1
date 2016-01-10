@@ -14,11 +14,11 @@ public class HashTable<K, V> extends AbstractMap<K, V> {
 	 */
 	private Entry<K, V> hashTable[];
 
-	HashTable() {
+	public HashTable() {
 		this(DEFAULT_INITIAL_SIZE);
 	}
 
-	HashTable(int initialSize) {
+	public HashTable(int initialSize) {
 		if (initialSize < 0)
 			throw new IllegalArgumentException("Illegal initial size: "
 					+ initialSize);
@@ -30,7 +30,7 @@ public class HashTable<K, V> extends AbstractMap<K, V> {
 	 * Each object contain three atributes: K key - unique attribute, int hash -
 	 * this attributes based on key, V value,
 	 */
-	static class Entry<K, V> {
+	public class Entry<K, V> {
 		K key;
 		V value;
 		int hash;
