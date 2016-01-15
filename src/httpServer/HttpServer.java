@@ -1,8 +1,8 @@
-package another_server;
+package httpServer;
 
-import java.io.BufferedInputStream;
+import httpRequest.HttpRequest;
+
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -35,22 +35,21 @@ public class HttpServer {
 		public static final String RESP_200 = "200 OK";
 		public static final String POST = "POST";
 		public static final String GET = "GET";
-		private Socket s;
-		private InputStream is;
+		private Socket socket;
 		private OutputStream os;
 
 		String inputMethod = null;
 		String request = null;
 
 		private SocketProcessor(Socket s) throws Throwable {
-			this.s = s;
-			this.is = s.getInputStream();
+			this.socket = s;
 			this.os = s.getOutputStream();
 		}
 
 		public void run() {
 			try {
-				String header[] = readInput().split("\n");
+				HttpRequest httpRequest = new HttpRequest();
+				String header[] = httpRequest.readRequest(socket).split("\n");
 				inputMethod = header[0].split(" ")[0];
 				request = header[0].split(" ")[1];
 				if (!inputMethod.equals(GET) && !inputMethod.equals(POST)) {
@@ -78,7 +77,7 @@ public class HttpServer {
 				/* do nothing */
 			} finally {
 				try {
-					s.close();
+					socket.close();
 				} catch (Throwable t) {
 					/* do nothing */
 				}
@@ -99,21 +98,5 @@ public class HttpServer {
 			os.close();
 		}
 
-		private String readInput() throws Throwable {
-			BufferedInputStream bis = new BufferedInputStream(is);
-			InputStreamReader isr = new InputStreamReader(bis);
-			StringBuffer process = new StringBuffer();
-			while (true) {
-				char[] cbuf = new char[1024];
-				isr.read(cbuf);
-				for (char c : cbuf) {
-					process.append(c);
-				}
-				System.out.println(process);
-
-				break;
-			}
-			return process.toString();
-		}
 	}
 }
