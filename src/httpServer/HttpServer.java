@@ -49,30 +49,9 @@ public class HttpServer {
 		public void run() {
 			try {
 				HttpRequest httpRequest = new HttpRequest();
-				String header[] = httpRequest.readRequest(socket).split("\n");
-				inputMethod = header[0].split(" ")[0];
-				request = header[0].split(" ")[1];
-				if (!inputMethod.equals(GET) && !inputMethod.equals(POST)) {
-					writeResponse("YOBA, eto ti?", RESP_403);
-				} else if (inputMethod.equals(POST)) {
-					String body = "";
-					if (header.length < 7) {
-						writeResponse("No body in request", RESP_503);
-					} else {
-						for (int i = 7; i < header.length; i++) {
-							body += header[i];
-						}
-						System.out.println(body);
-						hashTable.addEntry(request, body);
-					}
-				} else if (inputMethod.equals(GET)) {
-					HashTable.Entry e = hashTable.getEntry(request);
-					if (null != e) {
-						writeResponse(e.getValue().toString(), RESP_200);
-					} else {
-						writeResponse(RESP_404, RESP_404);
-					}
-				}
+
+				String code = httpRequest.readRequest(socket);
+				writeResponse("server return code " + code + "\r\n", code);
 			} catch (Throwable t) {
 				/* do nothing */
 			} finally {
